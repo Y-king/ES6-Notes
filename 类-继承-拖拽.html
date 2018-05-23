@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ES6-类-继承-实现简单拖拽效果</title>
+    <style>
+        .box{width: 100px;height: 100px; background: #f00; position: absolute; top: 0;text-align: center;line-height: 100px; color: #fff; font-size: 18px; cursor: pointer;}
+        .one{left: 0;}
+        .two{right: 0;}
+    </style>
+</head>
+<body>
+    <div class="box one" id="one">ONE</div>
+    <div class="box two" id="two">TWO</div>
+</body>
+<script>
+
+    //父类
+    class Drag{
+        constructor(id){
+            this.oDiv = document.querySelector(id);
+            this.disX = 0;
+            this.disY = 0;
+            this.init();
+        }
+        init(){
+            this.oDiv.onmousedown =function(event){
+                this.disX = event.clientX - this.oDiv.offsetLeft;
+                this.disX = event.clientY - this.oDiv.offsetTop;
+                document.onmousemove = this.fnMove.bind(this);
+                document.onmouseup = this.fnUp.bind(this);
+                return false;
+            }.bind(this)
+        }
+        fnMove(event){
+
+            console.log(`鼠标指针相对于浏览器页面（或客户区）的水平坐标：${event.clientX}`);
+            console.log(`方块的左上角相对于浏览器左边界的距离：${this.oDiv.offsetLeft}`);
+
+            this.oDiv.style.left = event.clientX - this.disX + 'px';
+            this.oDiv.style.top = event.clientY - this.disY +'px';
+        }
+
+        fnUp(){
+            document.onmousemove = null;
+            document.onmouseup = null;
+        }
+    }
+
+    //子类
+    class LimitDrag extends Drag{
+        fnMove(event){
+            super.fnMove(event);    //super 关键字用于访问父对象上的函数。
+            //限制拖拽的范围
+            if(this.oDiv.offsetLeft<=0){
+                this.oDiv.style.left = 0;
+            };
+            if(this.oDiv.offsetTop<=0){
+                this.oDiv.style.top = 0;
+            };
+        }
+    }
+
+    //调用
+    new Drag('#one');
+    new LimitDrag('#two')
+</script>
+</html>
